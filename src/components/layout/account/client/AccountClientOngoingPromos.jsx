@@ -4,10 +4,18 @@ import FormContainer from "../../../form/FormContainer";
 import AltButton from "../../../form/AltButton";
 import UseVerify from "../../../../hooks/useVerify";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate  } from "react-router-dom";
+import ModalWindow from "../../../ModalWindow";
+import StandartButton from "../../../form/StandartButton";
+import acceptIcon from "../../../../images/icons/accept.svg";
+
+import arrow from "../../../../images/icons/arrow.svg";
+
+
 
 function formatDate(inputDate) {
   const date = new Date(inputDate);
+
 
   const day = date.getDate();
   const month = date.getMonth() + 1;
@@ -24,6 +32,8 @@ function formatDate(inputDate) {
 const AcountClientOngoingPromos = () => {
   const navigation = useNavigate();
   const [data, setData] = useState([]);
+  const [isPopup, setIsPopup] = useState(false);
+
 
   const getData = async () => {
     try {
@@ -44,22 +54,42 @@ const AcountClientOngoingPromos = () => {
     if (statusPromo === "wait") {
       return "Pending";
     } else if (statusPromo === "work") {
-      return "Confirmed";
+      return "Distributing";
     } else {
-      return "Pending";
+      return "Confirmed";
     }
   };
 
   useEffect(() => {
     getData();
+    setIsPopup(+window.sessionStorage.getItem("isPopup") === 1);
   }, []);
+
+
   return (
     <section className="account-client-past-promos">
       <div className="container-form">
-        <div className="account-client-past-promos-block">
+        <div className="account-client-past-promos-block" style={{position: 'relative'}}>
           <TitleSection title="MY" span="account" />
 
           <p className="account-client-past-promos-second">Ongoing promos</p>
+
+
+          <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/client")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
           <FormContainer
             style={{
@@ -102,7 +132,7 @@ const AcountClientOngoingPromos = () => {
                 ))}
               </ul>
 
-              {data.length > 20 && (
+              {/* {data.length > 20 && (
                 <div
                   style={{
                     display: "flex",
@@ -112,11 +142,50 @@ const AcountClientOngoingPromos = () => {
                 >
                   <AltButton text="See more" />
                 </div>
-              )}
+              )} */}
             </div>
           </FormContainer>
         </div>
       </div>
+
+      <ModalWindow isOpen={isPopup} setClose={setIsPopup}>
+        <div className="signup-client-modal">
+          <img className="signup-client-modal-icon" src={acceptIcon} />
+
+          <h2 className="signup-client-modal-title">Congratulations!</h2>
+
+          <p className="signup-client-modal-second">
+            You can now check the status of your Promotion request in the{" "}
+            <button
+              className="signup-client-modal-second"
+              style={{
+                color: "#3330E4",
+                textDecorationLine: "underline",
+                cursor: "pointer",
+              }}
+              onClick={() => navigation("/account/client/ongoing-promos")}
+            >
+              "Ongoing Promo"
+            </button>
+          </p>
+
+          <StandartButton
+            text="Ok"
+            style={{
+              padding: "8px 80px",
+              marginTop: "30px",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+            onClick={() => {
+              window.sessionStorage.setItem("isPopup", 0);
+              setIsPopup(false);
+            }}
+          />
+        </div>
+      </ModalWindow>
+
+
     </section>
   );
 };

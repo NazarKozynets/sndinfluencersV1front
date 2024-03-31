@@ -7,6 +7,7 @@ import StandartButton from "../../../../form/StandartButton";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setCurrentWindow,
+  setSelectAmount,
   setSelectInfluencer,
   setSelectPrice,
 } from "../../../../../redux/slice/create-promo";
@@ -21,13 +22,28 @@ import {
   Scrollbar,
 } from "swiper/modules";
 
+import { useNavigate } from "react-router-dom";
+
+
+import arrow from "../../../../../images/icons/arrow.svg";
+
+
 const AccountClientOffers = () => {
+  const navigation = useNavigate();
   const [prices, setPrices] = useState([]);
   const dispatch = useDispatch();
   const [influencers, setInfluencers] = useState([]);
 
   const currentPrice = useSelector(
     (state) => state.createPromo.data.selectPrice.variant
+  );
+
+  const dataForm = useSelector(
+    (state) => state.createPromo.data
+  );
+
+  const customAmount = useSelector(
+    (state) => state.createPromo.data.selectPrice.amount
   );
 
   const customePrice = useSelector(
@@ -39,6 +55,8 @@ const AccountClientOffers = () => {
   );
 
   const selectPrice = (id) => {
+    let balance = window.sessionStorage.getItem("balance");
+
     const searchPrice = prices.find((item) => item.id === id);
 
     const updateList = influencers.map((item, index) => {
@@ -56,13 +74,19 @@ const AccountClientOffers = () => {
           connect_text: `Offer ${searchPrice.id}`,
         };
       } else {
+        if (item.active && item.connect) {
+          return {
+            ...item,
+            active: false,
+            connect: false,
+          };
+        }
         return {
           ...item,
         };
       }
     });
 
-    // console.log(updateList);
     const filterInfluencers = searchPrice.connectInfluencer.map((item) => ({
       influencerId: item.influencerId,
       confirmation: "wait",
@@ -75,11 +99,19 @@ const AccountClientOffers = () => {
         confirmation: "wait",
         instagramUsername: item.instagramUsername,
       }));
-      dispatch(
-        setSelectInfluencer([...filterInfluencers, ...currentSelectInfluencers])
-      );
+      const filterCurrentSelectInfluencer = [];
+      const mass = [...filterInfluencers].forEach((item) => {
+        const checkUnion = filterCurrentSelectInfluencer.find(
+          (fin) => fin.instagramUsername === item.instagramUsername
+        );
+
+        if (!checkUnion) {
+          filterCurrentSelectInfluencer.push(item);
+        }
+      });
+      dispatch(setSelectInfluencer(filterCurrentSelectInfluencer));
     } else {
-      dispatch(setSelectInfluencer([...filterInfluencers]));
+      dispatch(setSelectInfluencer(filterInfluencers));
     }
     setInfluencers(updateList);
 
@@ -101,7 +133,7 @@ const AccountClientOffers = () => {
       setInfluencers(checkInfluencers);
 
       const currentSelectInfluencers = influencers.filter(
-        (item) => item.active
+        (item) => !item.connect && item.active
       );
 
       const totalSelectInfluencers = currentSelectInfluencers.map((item) => ({
@@ -110,13 +142,17 @@ const AccountClientOffers = () => {
         instagramUsername: item.instagramUsername,
       }));
       dispatch(setSelectInfluencer(totalSelectInfluencers));
-      const newPrice = influencers.reduce((acc, current) => {
+      let newPrice = influencers.reduce((acc, current) => {
         if (!current.price) return acc;
-        const price = current.price.replace(/\D/g, "");
+        let price = current.price.replace(/\D/g, "");
+
+        if(current.customPrice){
+          price = current.customPrice;
+        }
 
         if (current.active) {
           if (!current.connect) {
-            return acc + Number(price);
+            return acc + Number(price) * 2;
           } else {
             return acc;
           }
@@ -128,17 +164,33 @@ const AccountClientOffers = () => {
       dispatch(
         setSelectPrice({
           variant: 0,
-          price: 0 + newPrice,
+          price: 0 + newPrice
         })
       );
-      console.log("ok");
       return;
     }
 
     if (customePrice !== 0) {
       const newPrice = influencers.reduce((acc, current) => {
         if (!current.price) return acc;
-        const price = current.price.replace(/\D/g, "");
+        let price = current.price.replace(/\D/g, "");
+
+        if(current.customPrice){
+          price = current.customPrice;
+        }
+
+
+        const checkConnect = (() => {
+          const searchPrice = prices.find((item) => item.id === id);
+          if (!searchPrice) return false;
+          return searchPrice.connectInfluencer.find(
+            (item) =>
+              item.influencerId === current._id &&
+              item.instagramUsername === current.instagramUsername
+          );
+        })();
+
+        if (checkConnect) return acc;
 
         if (current.active) {
           if (!current.connect) {
@@ -162,16 +214,20 @@ const AccountClientOffers = () => {
       return;
     }
 
-    const newPrice = influencers.reduce((acc, current) => {
+    let newPrice = influencers.reduce((acc, current) => {
       if (!current.price) return acc;
-      const price = current.price.replace(/\D/g, "");
+      let price = current.price.replace(/\D/g, "");
+
+      if(current.customPrice){
+        price = current.customPrice;
+      }
 
       if (current.active) {
         if (!current.connect) {
           if (currentPrice !== 0) {
             return acc + Number(price) * 2;
           } else {
-            return acc + Number(price);
+            return acc + Number(price) * 2;
           }
         } else {
           return acc;
@@ -182,18 +238,33 @@ const AccountClientOffers = () => {
     }, 0);
 
     const priceOffer = prices.find((item) => item.id === currentPrice);
+    let totalOffer = prices.find((item) => item.id === id).price;
+    let totalCustomOffer = priceOffer?.price + newPrice;
+
+    dispatch(
+      setSelectAmount(priceOffer ? totalCustomOffer : 0 + newPrice)
+    );
+
+    dispatch(
+      setSelectAmount(totalOffer)
+    );
+
+    if (totalCustomOffer > balance)
+      totalCustomOffer = totalCustomOffer - balance;
+    if (newPrice > balance) newPrice = newPrice - balance;
+    if (totalOffer > balance) totalOffer = totalOffer - balance;
 
     dispatch(
       setSelectPrice({
         variant: id,
-        price: priceOffer ? priceOffer.price + newPrice : 0 + newPrice,
+        price: priceOffer ? totalCustomOffer : 0 + newPrice,
       })
     );
 
     dispatch(
       setSelectPrice({
         variant: id,
-        price: prices.find((item) => item.id === id).price,
+        price: totalOffer,
       })
     );
   };
@@ -206,6 +277,8 @@ const AccountClientOffers = () => {
     //     price: 0,
     //   })
     // );
+    let balance = window.sessionStorage.getItem("balance");
+
     const updateList = influencers.map((item) => {
       if (item.instagramUsername === instagramUsername) {
         if (item.active) {
@@ -225,16 +298,20 @@ const AccountClientOffers = () => {
       return item;
     });
 
-    const newPrice = updateList.reduce((acc, current) => {
+    let newPrice = updateList.reduce((acc, current) => {
       if (!current.price) return acc;
-      const price = current.price.replace(/\D/g, "");
+      let price = current.price.replace(/\D/g, "");
+
+      if(current.customPrice){
+        price = current.customPrice;
+      }
 
       if (current.active) {
         if (!current.connect) {
           if (currentPrice !== 0) {
             return acc + Number(price) * 2;
           } else {
-            return acc + Number(price);
+            return acc + Number(price) * 2;
           }
         } else {
           return acc;
@@ -254,12 +331,20 @@ const AccountClientOffers = () => {
         confirmation: "wait",
       }));
 
-    console.log(newPrice);
+    let totalCustomOffer = priceOffer?.price + newPrice;
+
+    dispatch(
+      setSelectAmount(priceOffer ? totalCustomOffer : 0 + newPrice)
+    );
+
+    if (totalCustomOffer > balance)
+      totalCustomOffer = totalCustomOffer - balance;
+    if (newPrice > balance) newPrice = newPrice - balance;
 
     dispatch(
       setSelectPrice({
         variant: currentPrice,
-        price: priceOffer ? priceOffer.price + newPrice : 0 + newPrice,
+        price: priceOffer ? totalCustomOffer : 0 + newPrice,
       })
     );
 
@@ -305,14 +390,21 @@ const AccountClientOffers = () => {
         ...item,
         active: false,
         connect: false,
-      }));
+      })).sort((a, b) => {
+        // Assign a high order value for items without the order field
+        const orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
+        const orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
+      
+        return orderA - orderB;
+      });
+      
       setInfluencers(listInfluencers);
     }
   };
 
   const nextForm = () => {
     if (customePrice === 0 || selectInfluencers.length === 0) return;
-
+    console.log(dataForm, "1 dataForm");    
     dispatch(setCurrentWindow(1));
   };
 
@@ -334,19 +426,43 @@ const AccountClientOffers = () => {
   useEffect(() => {
     getData();
   }, []);
+
   return (
     <section className="account-client">
       {/* <div className="container"> */}
-      <div className="account-client-block">
+      <div className="account-client-block" style={{position: 'relative'}}>
         <h1 className="account-client-title">service offered</h1>
         <h2 className="account-client-second">influencers post for clients</h2>
 
         <TitleSection title="Our" span="offers" />
+        
+
+        <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 50,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/client")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
+        
 
         {/* <ul className="account-client-offers"> */}
         <Swiper
           modules={[Navigation, Pagination, Scrollbar, Autoplay, A11y]}
           navigation
+          pagination={{
+            enabled: true,
+            bulletElement: "button",
+            clickable: true,
+          }}
           breakpoints={{
             340: {
               slidesPerView: 1,
@@ -374,7 +490,7 @@ const AccountClientOffers = () => {
           }}
           onSlideChange={() => console.log("slide change")}
           onSwiper={(swiper) => console.log(swiper)}
-          style={{ paddingTop: 30, paddingBottom: 30 }}
+          style={{ padding: "30px 20px 180px 20px" }}
         >
           {prices.map((item, index) => (
             <SwiperSlide key={item.id}>
@@ -399,7 +515,10 @@ const AccountClientOffers = () => {
                       <li
                         key={index}
                         className="account-client-offers-text-item"
+                        style={{display: "flex", alignItems: "center"}}
                       >
+                        {item.avatar ? (<img style={{maxWidth: '40px'}} src={item.avatar} alt={item.instagramUsername} />) : null}
+                       
                         {item.instagramUsername}
                       </li>
                     ))}

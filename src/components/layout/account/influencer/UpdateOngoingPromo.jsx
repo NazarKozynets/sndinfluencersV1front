@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { is24HoursPassed } from "../../../../utils/validations";
 import ModalWindow from "../../../ModalWindow";
+import InputFile from "../../../form/InputFile";
 
 const UpdateOngoingPromo = () => {
   const params = useParams();
@@ -28,6 +29,7 @@ const UpdateOngoingPromo = () => {
     postLink: "",
     screenshot: "",
   });
+  const [screenshot, setScreenshot] = useState(null);
 
   const getData = async () => {
     if (!params.influencerId || !params.promoId || !params.instagram) {
@@ -35,13 +37,13 @@ const UpdateOngoingPromo = () => {
     }
     try {
       const result = await axios(
-        `${process.env.REACT_APP_SERVER}/promos/get-ongoing-promo-one?influencerId=${params.influencerId}&promoId=${params.promoId}`
+        `${process.env.REACT_APP_SERVER}/promos/get-ongoing-promo-one?influencerId=${params.influencerId}&promoId=${params.promoId}&instagramUsername=${params.instagram}`
       );
 
       console.log(result.data.date);
       if (result.data.code === 200) {
         setFormData(result.data.promo);
-        setData(is24HoursPassed(result.data.date));
+        setData(is24HoursPassed(result.data.promo.updatedAt, result.data));
       }
     } catch (err) {
       console.log(err);
@@ -54,21 +56,77 @@ const UpdateOngoingPromo = () => {
     }
 
     try {
-      const result = await axios.put(
-        `${process.env.REACT_APP_SERVER}/promos/update-ongoing?influencerId=${params.influencerId}&promoId=${params.promoId}&instagramUsername=${params.instagram}`,
-        formData
-      );
+      const formDataScreenshot = new FormData();
+      formDataScreenshot.append("file", screenshot); // 'file' is the key expected on the server side
 
-      if (result.data.code === 200) {
-        getData();
-        if (!data.isPassed) {
-          setIsWindow(true);
-        } else {
-          setIsWindowTwo(true);
+      if (screenshot) {
+        try {
+          const responseURL = await axios.post(
+            `${process.env.REACT_APP_SERVER}/promos/uploadScreenshot`,
+            formDataScreenshot,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          const result = await axios.put(
+            `${process.env.REACT_APP_SERVER}/promos/update-ongoing?influencerId=${params.influencerId}&promoId=${params.promoId}&instagramUsername=${params.instagram}`,
+            {
+              brand: formData.brand,
+              caption: formData.caption,
+              datePost: formData.datePost,
+              impressions: formData.impressions,
+              reach: formData.reach,
+              like: formData.like,
+              postLink: formData.postLink,
+              screenshot: responseURL.data.data,
+            }
+          );
+
+          if (result.data.code === 200) {
+            getData();
+            if (!data.isPassed) {
+              setIsWindow(true);
+            } else {
+              setIsWindowTwo(true);
+            }
+          }
+          // console.log('File uploaded successfully', response.data);
+        } catch (error) {
+          console.error("Error uploading file", error);
+        }
+      } else {
+        try {
+          const result = await axios.put(
+            `${process.env.REACT_APP_SERVER}/promos/update-ongoing?influencerId=${params.influencerId}&promoId=${params.promoId}&instagramUsername=${params.instagram}`,
+            {
+              brand: formData.brand,
+              caption: formData.caption,
+              datePost: formData.datePost,
+              impressions: formData.impressions,
+              reach: formData.reach,
+              like: formData.like,
+              postLink: formData.postLink,
+              screenshot: "",
+            }
+          );
+
+          if (result.data.code === 200) {
+            getData();
+            if (!data.isPassed) {
+              setIsWindow(true);
+            } else {
+              setIsWindowTwo(true);
+            }
+          }
+          // console.log('File uploaded successfully', response.data);
+        } catch (error) {
+          console.error("Error uploading file", error);
         }
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -79,7 +137,7 @@ const UpdateOngoingPromo = () => {
     <section className="invoice-result">
       <div className="container-form">
         <div className="invoice-result-block">
-          <TitleSection title="campaign result" span="& invoice" />
+          <TitleSection title="campaign result" />
 
           <FormContainer
             style={{
@@ -98,11 +156,34 @@ const UpdateOngoingPromo = () => {
             <TextInput
               style={{ maxWidth: "665px", margin: "60px auto 0 auto" }}
               title="Date Post"
-              placeholder="Enter date post"
+              placeholder="Enter date post dd/mm/yyyy"
               value={formData.datePost}
-              setValue={(value) =>
-                setFormData({ ...formData, datePost: value })
-              }
+              setValue={(value) => {
+                // Remove any non-digit characters
+                const numericValue = value.replace(/[^\d]/g, "");
+
+                // Format the string
+                let formattedValue = "";
+                if (numericValue.length <= 2) {
+                  // First two digits for the day
+                  formattedValue = numericValue;
+                } else if (numericValue.length <= 4) {
+                  // Add slash after the day
+                  formattedValue = `${numericValue.slice(
+                    0,
+                    2
+                  )}/${numericValue.slice(2)}`;
+                } else {
+                  // Add slashes for both day and month
+                  formattedValue = `${numericValue.slice(
+                    0,
+                    2
+                  )}/${numericValue.slice(2, 4)}/${numericValue.slice(4, 8)}`;
+                }
+
+                // Update state
+                setFormData({ ...formData, datePost: formattedValue });
+              }}
             />
 
             <TextInput
@@ -135,14 +216,11 @@ const UpdateOngoingPromo = () => {
               disabled={!data.isPassed}
               disabledTime={data.hoursLeft}
             />
-            <TextInput
+            <InputFile
               style={{ maxWidth: "665px", margin: "60px auto 0 auto" }}
-              title="Screenshoy insights"
-              placeholder="Attach here the screenshot of the insights"
-              value={formData.screenshot}
-              setValue={(value) =>
-                setFormData({ ...formData, screenshot: value })
-              }
+              title="Screenshot insights"
+              placeholder="Attach here the link of the screenshot of the insights"
+              setValue={(value) => setScreenshot(value)}
               disabled={!data.isPassed}
               disabledTime={data.hoursLeft}
             />

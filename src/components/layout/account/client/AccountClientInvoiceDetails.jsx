@@ -7,13 +7,20 @@ import StandartButton from "../../../form/StandartButton";
 import UseVerify from "../../../../hooks/useVerify";
 import axios from "axios";
 
+import { useNavigate } from "react-router-dom";
+
+
+import arrow from "../../../../images/icons/arrow.svg";
+
 const AccountClientInvoiceDetails = () => {
+  const navigation = useNavigate();
   const [data, setData] = useState({
     firstName: "",
     lastName: "",
     address: "",
     country: "",
     vatNumber: "",
+    company: "",
   });
   const [isOpenPersonal, setIsOpenPersonal] = useState(false);
   const [dataInvoice, setDataInvoice] = useState({
@@ -22,6 +29,7 @@ const AccountClientInvoiceDetails = () => {
     address: "",
     country: "",
     vatNumber: "",
+    company: "",
   });
 
   const updateInvoiceDetails = async () => {
@@ -49,6 +57,8 @@ const AccountClientInvoiceDetails = () => {
 
       if (result.data.code === 200) {
         setData(result.data.invoiceDetails);
+        setDataInvoice(result.data.invoiceDetails);
+        
       }
     } catch (err) {
       console.log(err);
@@ -63,8 +73,24 @@ const AccountClientInvoiceDetails = () => {
     <>
       <section className="account-influencer-details">
         <div className="container-form">
-          <div className="account-influencer-details-block">
+          <div className="account-influencer-details-block" style={{position: 'relative'}}>
             <TitleSection title="MY" span="account" />
+
+          <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/client")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
             <p className="account-influencer-details-second">
               My Invoice Details
@@ -124,6 +150,14 @@ const AccountClientInvoiceDetails = () => {
                   </div>
                   <div className="account-influencer-details-wrapper-content-item">
                     <p className="account-influencer-details-wrapper-content-title">
+                      Company
+                    </p>
+                    <p className="account-influencer-details-wrapper-content-value">
+                      {data.company ? data.company : `No data`}
+                    </p>
+                  </div>
+                  <div className="account-influencer-details-wrapper-content-item">
+                    <p className="account-influencer-details-wrapper-content-title">
                       VAT Number (only if VAT Registered)
                     </p>
                     <p className="account-influencer-details-wrapper-content-value">
@@ -179,6 +213,15 @@ const AccountClientInvoiceDetails = () => {
             value={dataInvoice.country}
             setValue={(value) =>
               setDataInvoice({ ...dataInvoice, country: value })
+            }
+          />
+          <TextInput
+            title="Company"
+            placeholder="Company"
+            style={{ marginTop: "50px" }}
+            value={dataInvoice.company}
+            setValue={(value) =>
+              setDataInvoice({ ...dataInvoice, company: value })
             }
           />
 

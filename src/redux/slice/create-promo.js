@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   currentWindow: 0,
   data: {
+    amount: 0,
     selectPrice: {
       variant: 0,
       price: 0,
@@ -28,6 +29,9 @@ export const createPromoSlice = createSlice({
     },
     setSelectPrice: (state, action) => {
       state.data.selectPrice = action.payload;
+    },
+    setSelectAmount: (state, action) => {
+      state.data.amount = action.payload;
     },
     setSelectInfluencer: (state, action) => {
       state.data.selectInfluencers = action.payload;
@@ -56,6 +60,7 @@ export const createPromoSlice = createSlice({
 
     setClearForm: (state) => {
       state.data = {
+        amount: 0,
         selectPrice: {
           variant: 0,
           price: 0,
@@ -77,6 +82,7 @@ export const createPromoSlice = createSlice({
 export const {
   setCurrentWindow,
   setSelectPrice,
+  setSelectAmount,
   setSelectInfluencer,
   setVideoLink,
   setPostDescription,

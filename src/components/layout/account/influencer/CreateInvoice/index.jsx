@@ -10,10 +10,11 @@ import axios from "axios";
 import UseVerify from "../../../../../hooks/useVerify";
 import StandartButton from "../../../../form/StandartButton";
 import AltButton from "../../../../form/AltButton";
+import { setCurrentWindow } from "../../../../../redux/slice/create-invoice";
 
 const AccountInfluencerCreateInvoice = () => {
   const dispatch = useDispatch();
-  const currentWindow = useSelector(
+  let currentWindow = useSelector(
     (state) => state.createInvoice.currentWindow
   );
 
@@ -122,7 +123,7 @@ const AccountInfluencerCreateInvoice = () => {
             marginTop: 30,
           }}
         >
-          <AltButton text="Back Step" />
+          <AltButton text="Back Step" onClick={() => dispatch(setCurrentWindow(--currentWindow))} />
         </div>
       </div>
     </section>

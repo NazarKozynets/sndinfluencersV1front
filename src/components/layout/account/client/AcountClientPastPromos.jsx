@@ -6,6 +6,10 @@ import UseVerify from "../../../../hooks/useVerify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+import arrow from "../../../../images/icons/arrow.svg";
+
+
+
 function formatDate(inputDate) {
   const date = new Date(inputDate);
 
@@ -46,10 +50,26 @@ const AcountClientPastPromos = () => {
   return (
     <section className="account-client-past-promos">
       <div className="container-form">
-        <div className="account-client-past-promos-block">
+        <div className="account-client-past-promos-block" style={{position: "relative"}}>
           <TitleSection title="MY" span="account" />
 
           <p className="account-client-past-promos-second">Past promos</p>
+
+          <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/client")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
           <FormContainer
             style={{

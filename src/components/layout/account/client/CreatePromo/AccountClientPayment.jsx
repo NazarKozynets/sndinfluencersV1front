@@ -26,6 +26,8 @@ const AccountClientPayment = () => {
   const [data, setData] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenTransfer, setIsOpenTranfer] = useState(false);
+  const [isOpenTransferPaypal, setIsOpenTranferPaypal] = useState(false);
+  const [isOpenTransferCard, setIsOpenTranferCard] = useState(false);
   const [transferCurrent, setTranfertCurrent] = useState("");
 
   const navigation = useNavigate();
@@ -53,6 +55,7 @@ const AccountClientPayment = () => {
         );
         if (result.data.code === 201) {
           document.location.href = result.data.paymentUrl;
+          window.sessionStorage.setItem("isPopup", 1);
         }
         dispatch(setClearForm());
         dispatch(setCurrentWindow(0));
@@ -77,11 +80,13 @@ const AccountClientPayment = () => {
             nameProduct: `Offers ${dataPromo.selectPrice.variant}`,
             userId: dataFetch._id,
             amount: dataPromo.selectPrice.price,
+            country: transferCurrent,
           }
         );
         if (result.data.code === 201) {
           navigation("/");
         }
+        window.sessionStorage.setItem("isPopup", 1);
         dispatch(setClearForm());
         dispatch(setCurrentWindow(0));
       }
@@ -91,7 +96,9 @@ const AccountClientPayment = () => {
   };
 
   const backForm = () => {
-    if (isOpenTransfer) {
+    if (isOpenTransfer || isOpenTransferPaypal || isOpenTransferCard) {
+      if (isOpenTransferPaypal) setIsOpenTranferPaypal(false);
+      if (isOpenTransferCard) setIsOpenTranferCard(false);
       if (transferCurrent === "") {
         setIsOpenTranfer(false);
       } else {
@@ -281,7 +288,10 @@ const AccountClientPayment = () => {
               <div
                 className="account-client-payment-content"
                 style={{
-                  display: isOpenTransfer ? "none" : "block",
+                  display:
+                    isOpenTransfer || isOpenTransferCard || isOpenTransferPaypal
+                      ? "none"
+                      : "block",
                 }}
               >
                 <TitleSection title="pay" span="with" />
@@ -289,12 +299,18 @@ const AccountClientPayment = () => {
                 <ul className="account-client-payment-content-methods">
                   <li className="account-client-payment-content-methods-item">
                     <button
-                      onClick={createPromo}
+                      onClick={() => setIsOpenTranferCard(true)}
                       className="account-client-payment-content-methods-button"
                     >
-                      Bank card <br />
-                      or
-                      <br /> PayPal
+                      Bank card
+                    </button>
+                  </li>
+                  <li className="account-client-payment-content-methods-item">
+                    <button
+                      onClick={() => setIsOpenTranferPaypal(true)}
+                      className="account-client-payment-content-methods-button"
+                    >
+                      PayPal
                     </button>
                   </li>
                   <li className="account-client-payment-content-methods-item">
@@ -347,7 +363,7 @@ const AccountClientPayment = () => {
                 </ul>
               </div>
 
-              {isOpenTransfer ? (
+              {isOpenTransfer && (
                 <div
                   className="account-client-payment-select-transfer"
                   style={{
@@ -430,7 +446,152 @@ const AccountClientPayment = () => {
                     </div>
                   </div>
                 </div>
-              ) : null}
+              )}
+
+              {isOpenTransferPaypal && (
+                <div
+                  className="account-client-payment-select-transfer"
+                  style={{
+                    padding: "20px 0px 40px 0px",
+                  }}
+                >
+                  <TitleSection title="Paypal" />
+                  <div
+                    className="account-client-payment-select-transfer-data"
+                    style={{
+                      display: "block",
+                    }}
+                  >
+                    <>
+                      <p className="account-client-payment-select-transfer-data-title">
+                        Please send the funds to:{" "}
+                        <span className="account-client-payment-select-transfer-data-value">
+                          technotvchannel@gmail.com
+                        </span>
+                      </p>
+                    </>
+
+                    <p className="account-client-payment-select-transfer-data-warning">
+                      In the "NOTE" section, enter the PAYMENT REFERENCE NUMBER
+                      - *P
+                      {data
+                        ? data.referenceNumber
+                          ? data.referenceNumber
+                          : ""
+                        : ""}
+                      *
+                    </p>
+                    <p className="account-client-payment-select-transfer-data-title">
+                      <span className="account-client-payment-select-transfer-data-value">
+                        If possible, send the payment as “Friends & Family”
+                      </span>
+                    </p>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: 30,
+                      }}
+                    >
+                      {" "}
+                      <StandartButton
+                        text="Confirm Payment Sent"
+                        onClick={() => createPromoTranfer()}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isOpenTransferCard && (
+                <div
+                  className="account-client-payment-select-transfer"
+                  style={{
+                    padding: "20px 0px 40px 0px",
+                  }}
+                >
+                  <TitleSection
+                    title="Bank"
+                    span={`Transfer ${transferCurrent}`}
+                  />
+
+                  <div
+                    className="account-client-payment-select-transfer-data"
+                    style={{
+                      display: "block",
+                    }}
+                  >
+                    <>
+                      <p className="account-client-payment-select-transfer-data-title">
+                        Go On:{" "}
+                        <span className="account-client-payment-select-transfer-data-value">
+                          <a
+                            href="https://revolut.me/technotvltd"
+                            target="_blank"
+                          >
+                            https://revolut.me/technotvltd
+                          </a>
+                        </span>
+                      </p>
+                      <p className="account-client-payment-select-transfer-data-title">
+                        Select{" "}
+                        <span className="account-client-payment-select-transfer-data-value">
+                          the currency “EURO” and Enter the amount due, showing
+                          here on top
+                        </span>
+                      </p>
+                      <p className="account-client-payment-select-transfer-data-title">
+                        In the "NOTE"{" "}
+                        <span className="account-client-payment-select-transfer-data-value">
+                          section, enter the PAYMENT REFERENCE NUMBER *C
+                          {data
+                            ? data.referenceNumber
+                              ? data.referenceNumber
+                              : ""
+                            : ""}
+                        </span>
+                      </p>
+                      <p className="account-client-payment-select-transfer-data-title">
+                        Click “Pay”{" "}
+                      </p>
+                      <p className="account-client-payment-select-transfer-data-title">
+                        Select{" "}
+                        <span className="account-client-payment-select-transfer-data-value">
+                          payment by card and enter card details
+                        </span>
+                      </p>
+                      <p className="account-client-payment-select-transfer-data-title">
+                        Click “Pay”{" "}
+                      </p>
+                    </>
+
+                    <p className="account-client-payment-select-transfer-data-warning">
+                      ADD THIS PAYMENT REFERENCE NUMBER - *C
+                      {data
+                        ? data.referenceNumber
+                          ? data.referenceNumber
+                          : ""
+                        : ""}
+                      *
+                    </p>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: 30,
+                      }}
+                    >
+                      {" "}
+                      <StandartButton
+                        text="Confirm Payment Sent"
+                        onClick={() => createPromoTranfer()}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

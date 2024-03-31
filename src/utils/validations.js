@@ -67,13 +67,18 @@ export function validateDate(inputDate) {
   }
 }
 
-export function is24HoursPassed(inputDate) {
+export function is24HoursPassed(inputDate, data) {
   const currentDate = new Date();
   const inputDateTime = new Date(inputDate);
 
   const timeDifference = currentDate - inputDateTime;
 
   const twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+
+  if(data.postLink && data.caption){
+    return { isPassed: false, hoursLeft: 24 };
+
+  }
 
   if (timeDifference >= twentyFourHoursInMillis) {
     return { isPassed: true, hoursLeft: 0 };

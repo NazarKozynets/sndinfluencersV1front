@@ -4,6 +4,7 @@ import TextInput from "../../../../form/TextInput";
 import TextArea from "../../../../form/TextArea";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  setVat,
   setCity,
   setClearForm,
   setCompanyId,
@@ -33,11 +34,12 @@ const CreateInvoiceDetails = () => {
     contactPhone: false,
     contactEmail: false,
     companyName: false,
-    companyId: false,
+    // companyId: false,
     street: false,
     city: false,
     state: false,
     postcode: false,
+    vat: false,
     country: false,
     notes: false,
   });
@@ -48,13 +50,14 @@ const CreateInvoiceDetails = () => {
       contactPhone: false,
       contactEmail: false,
       companyName: false,
-      companyId: false,
+      // companyId: false,
       street: false,
       city: false,
       state: false,
       postcode: false,
       country: false,
       notes: false,
+      vat: false,
     };
     let haveError = false;
     for (let checkError in listError) {
@@ -62,8 +65,11 @@ const CreateInvoiceDetails = () => {
         if (checkError === "companyName" && !selectDetails) {
           continue;
         }
-        if (checkError === "companyId" && !selectDetails) {
-          continue;
+        // if (checkError === "companyId" && !selectDetails) {
+        //   continue;
+        // }
+        if (checkError === "vat" && !switchVAT) {
+          break;
         }
         haveError = true;
         listError = {
@@ -80,14 +86,21 @@ const CreateInvoiceDetails = () => {
     try {
       const { dataFetch } = await UseVerify();
 
+      let serverData = {
+        ...dataForm,
+        influencerId: dataFetch._id,
+        companyId: "",
+      };
+
+      delete serverData._id;
+
+      serverData.createdAt = new Date();
+
       const result = await axios.post(
         `${process.env.REACT_APP_SERVER}/invoice/create`,
-        {
-          ...dataForm,
-          influencerId: dataFetch._id,
-        }
+        serverData
       );
-      if (result.data.code === 201) {
+      if (+result.data.code === 201) {
         navigation(`/account/influencer/invoices`);
         dispatch(setClearForm());
       }
@@ -121,7 +134,7 @@ const CreateInvoiceDetails = () => {
 
         <div className="create-invoice-form">
           <div className="create-invoice-form-header">
-            <p className="create-invoice-form-header-title">Contact</p>
+            <p className="create-invoice-form-header-title">Contact Details</p>
           </div>
 
           <div className="create-invoice-form-content">
@@ -157,7 +170,6 @@ const CreateInvoiceDetails = () => {
               }
             />
 
-            {!selectDetails && (
               <div
                 className="create-invoice-form-content-switch"
                 style={{
@@ -179,7 +191,20 @@ const CreateInvoiceDetails = () => {
                   VAT Registered
                 </p>
               </div>
-            )}
+
+
+            {switchVAT &&    
+            <TextInput
+              title="VAT*"
+              placeholder="Enter VAT"
+              style={{ maxWidth: "665px", margin: "0 auto", marginTop: "60px" }}
+              value={dataForm.vat}
+              setValue={(value) => dispatch(setVat(value))}
+              error={errorForm.vat}
+              onFocus={() =>
+                setErrorForm({ ...errorForm, vat: false })
+              }
+            />}
           </div>
         </div>
 
@@ -201,7 +226,7 @@ const CreateInvoiceDetails = () => {
                   setErrorForm({ ...errorForm, companyName: false })
                 }
               />
-              <TextInput
+              {/* <TextInput
                 title="Company Id*"
                 placeholder="Enter Company Id"
                 style={{
@@ -213,9 +238,9 @@ const CreateInvoiceDetails = () => {
                 setValue={(value) => dispatch(setCompanyId(value))}
                 error={errorForm.companyId}
                 onFocus={() => setErrorForm({ ...errorForm, companyId: false })}
-              />
+              /> */}
 
-              <div
+              {/* <div
                 className="create-invoice-form-content-switch"
                 style={{
                   maxWidth: "665px",
@@ -235,7 +260,7 @@ const CreateInvoiceDetails = () => {
                 <p className="create-invoice-form-content-switch-text">
                   VAT Registered
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
         )}

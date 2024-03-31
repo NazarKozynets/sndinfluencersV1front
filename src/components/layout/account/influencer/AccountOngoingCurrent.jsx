@@ -10,6 +10,10 @@ import ImageWithFallback from "../../../ImageWithFallback";
 import altLogo from "../../../../images/alt-logo.jpg";
 import ModalWindow from "../../../ModalWindow";
 
+import arrow from "../../../../images/icons/arrow.svg";
+
+
+
 const AcountInfluencerOngoingCurrent = () => {
   const params = useParams();
   const navigation = useNavigate();
@@ -21,7 +25,7 @@ const AcountInfluencerOngoingCurrent = () => {
       const { dataFetch } = await UseVerify();
       console.log(params);
       const result = await axios(
-        `${process.env.REACT_APP_SERVER}/promos/get-ongoing-promo-one?influencerId=${dataFetch._id}&promoId=${params.id}`
+        `${process.env.REACT_APP_SERVER}/promos/get-ongoing-promo-one?influencerId=${dataFetch._id}&promoId=${params.id}&instagramUsername=${params.instagram}`
       );
 
       setData(result.data.promo);
@@ -39,10 +43,26 @@ const AcountInfluencerOngoingCurrent = () => {
     <>
       <section className="account-client-past-promos">
         <div className="container">
-          <div className="account-client-past-promos-block">
+          <div className="account-client-past-promos-block" style={{position: 'relative'}}>
             <TitleSection title="MY" span="account" />
 
             <p className="account-client-past-promos-second">Ongoing promos</p>
+
+            <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/influencer/ongoing-promos")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
             <FormContainer
               style={{
@@ -67,6 +87,7 @@ const AcountInfluencerOngoingCurrent = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      marginBottom: "20px"
                     }}
                   >
                     <ImageWithFallback
@@ -156,7 +177,7 @@ const AcountInfluencerOngoingCurrent = () => {
                 href="mailto:admin@soundinfluencers.com?subject=Support%20Request"
                 className="account-client-past-promos-current-report"
               >
-                Click here for Report
+                Click here for support
               </a>
             </div>
           </div>

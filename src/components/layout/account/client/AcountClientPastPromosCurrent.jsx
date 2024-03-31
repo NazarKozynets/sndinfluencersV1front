@@ -9,8 +9,13 @@ import ImageWithFallback from "../../../ImageWithFallback";
 import altLogo from "../../../../images/alt-logo.jpg";
 import StandartButton from "../../../form/StandartButton";
 
+import arrow from "../../../../images/icons/arrow.svg";
+
+
+
 const AcountClientPastPromosCurrent = () => {
   const params = useParams();
+
   const [data, setData] = useState({});
 
   const getData = async () => {
@@ -35,10 +40,26 @@ const AcountClientPastPromosCurrent = () => {
   return (
     <section className="account-client-past-promos">
       <div className="container">
-        <div className="account-client-past-promos-block">
+        <div className="account-client-past-promos-block" style={{position: "relative"}}>
           <TitleSection title="MY" span="account" />
 
           <p className="account-client-past-promos-second">Past promos</p>
+
+          <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/influencer")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
           <FormContainer style={{ marginTop: "70px" }}>
             <div className="account-client-past-promos-form-current">
@@ -56,6 +77,7 @@ const AcountClientPastPromosCurrent = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    marginBottom: "20px"
                   }}
                 >
                   <ImageWithFallback
@@ -129,7 +151,7 @@ const AcountClientPastPromosCurrent = () => {
               href="mailto:admin@soundinfluencers.com?subject=Support%20Request"
               className="account-client-past-promos-current-report"
             >
-              Click here for Report
+              Click here for support
             </a>
           </div>
         </div>

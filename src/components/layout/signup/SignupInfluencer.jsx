@@ -34,11 +34,13 @@ import {
 import axios from "axios";
 import CheckBox from "../../form/CheckBox";
 import deleteIcon from "../../../images/icons/close.svg";
+import InputFile from "../../form/InputFile";
 
 const SignupInfluencer = () => {
   const navigation = useNavigate();
   const dispatch = useDispatch();
   const dataForm = useSelector((state) => state.signupInfluencer);
+  const [avatar, setAvatar] = useState([]);
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -60,6 +62,27 @@ const SignupInfluencer = () => {
     password: false,
     repeatPassword: false,
   });
+
+  const [errorLogo, setErrorLogo] = useState(false);
+  const [fileImage, setFile] = useState([]);
+
+  const handleAvatar = (file, index) => {
+    if (file && file.type.match("image.*")) {
+      setFile([...fileImage, file]);
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        if(avatar[index]){
+          let avatarNew  = avatar;
+          avatarNew[index] =  { url: e.target.result };
+          return setAvatar([...avatarNew]);
+        }
+        setAvatar([...avatar, { url: e.target.result }]);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
 
   const nextForm = async () => {
     let errorsList = {
@@ -96,6 +119,46 @@ const SignupInfluencer = () => {
       errorsList = { ...errorsList, password: true };
     }
 
+    let dataFormNew = dataForm;
+
+
+    if (!fileImage || fileImage.length === 0) {
+      return; // Nothing to upload
+    }
+  
+    try {
+      // Create a deep copy of dataFormNew to ensure immutability
+      const updatedDataFormNew = {
+        ...dataFormNew,
+        instagram: await Promise.all(dataFormNew.instagram.map(async (instagramItem, index) => {
+          if (index < fileImage.length) {
+            const file = fileImage[index];
+  
+            const formData = new FormData();
+            formData.append("file", file);
+  
+            const responseURL = await axios.post(
+              `${process.env.REACT_APP_SERVER}/promos/uploadScreenshot`,
+              formData,
+              { headers: { "Content-Type": "multipart/form-data" } }
+            );
+  
+            if (responseURL.data) {
+              return { ...instagramItem, logo: responseURL.data.data }; // Updated item
+            }
+          }
+  
+          return instagramItem; // No changes needed
+        }))
+      };
+  
+      // Replace dataFormNew with the updated version (assuming you want to update)
+      dataFormNew = updatedDataFormNew;
+  
+    } catch (error) {
+      console.error("ERROR UPLOAD SCREENSHOT", error); 
+    }
+
     let checkInstagram = false;
     const checkFormErrorInstagram = errorsForm.instagram.map((item, index) => {
       let instagramUsername = !Boolean(
@@ -103,7 +166,6 @@ const SignupInfluencer = () => {
       );
       let instagramLink = !Boolean(dataForm.instagram[index].instagramLink);
       let followersNumber = !Boolean(dataForm.instagram[index].followersNumber);
-      let logo = !Boolean(dataForm.instagram[index].logo);
       let price = !Boolean(dataForm.instagram[index].price);
       let musicStyle = !Boolean(dataForm.instagram[index].musicStyle);
       let musicStyleOther = !Boolean(dataForm.instagram[index].musicStyleOther);
@@ -112,7 +174,6 @@ const SignupInfluencer = () => {
         instagramUsername ||
         instagramLink ||
         followersNumber ||
-        logo ||
         price ||
         musicStyle
       )
@@ -123,7 +184,6 @@ const SignupInfluencer = () => {
         instagramUsername: instagramUsername,
         instagramLink: instagramLink,
         followersNumber: followersNumber,
-        logo: logo,
         price: price,
       };
     });
@@ -149,7 +209,7 @@ const SignupInfluencer = () => {
         `${process.env.REACT_APP_SERVER}/auth/create/influencer`,
         {
           firstName: dataForm.firstName,
-          instagram: dataForm.instagram,
+          instagram: dataFormNew.instagram,
           email: dataForm.email,
           phone: dataForm.phone,
           password: dataForm.password,
@@ -390,7 +450,7 @@ const SignupInfluencer = () => {
                       />
 
                       {/* Logo */}
-                      <TextInput
+                      {/* <TextInput
                         title={
                           dataForm.instagram.length === 1
                             ? "Logo Link*"
@@ -418,6 +478,24 @@ const SignupInfluencer = () => {
                             instagram: instagramErrors,
                           });
                         }}
+                      /> */}
+
+                      {avatar[index] && (
+                        <img
+                          style={{ marginTop: "20px", maxWidth: "70px" }}
+                          src={avatar[index]?.url}
+                        />
+                      )}
+                      <InputFile
+                        title={
+                          dataForm.instagram.length === 1
+                            ? "Logo Link*"
+                            : `(${index + 1}) Logo Link*`
+                        }
+                        placeholder="logo"
+                        style={{ marginBottom: "50px", marginTop: "50px" }}
+                        setValue={(value)=>handleAvatar(value, index)}
+                        error={errorLogo}
                       />
 
                       {/* Price */}

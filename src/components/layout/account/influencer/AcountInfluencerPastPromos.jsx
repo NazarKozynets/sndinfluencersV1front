@@ -6,6 +6,10 @@ import UseVerify from "../../../../hooks/useVerify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+import arrow from "../../../../images/icons/arrow.svg";
+
+
+
 const AccountInfluencerPastPromos = () => {
   const navigation = useNavigate();
   const [data, setData] = useState([]);
@@ -30,8 +34,25 @@ const AccountInfluencerPastPromos = () => {
   return (
     <section className="account-client-past-promos">
       <div className="container-form">
-        <div className="account-client-past-promos-block">
+        <div className="account-client-past-promos-block" style={{position: "relative"}}>
           <TitleSection title="MY" span="account" />
+
+          <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/influencer")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
+
 
           <p className="account-client-past-promos-second">Past promos</p>
 
@@ -57,7 +78,7 @@ const AccountInfluencerPastPromos = () => {
                       }
                     >
                       <div className="account-client-past-promos-form-image">
-                        {item.client}
+                        {item.client.substring(0, 8)}
                       </div>
                       <p className="account-client-past-promos-form-text">
                         Promo {index + 1}
@@ -67,7 +88,7 @@ const AccountInfluencerPastPromos = () => {
                 ))}
               </ul>
 
-              {data.length > 20 && (
+              {/* {data.length > 20 && (
                 <div
                   style={{
                     display: "flex",
@@ -77,7 +98,7 @@ const AccountInfluencerPastPromos = () => {
                 >
                   <AltButton text="See more" />
                 </div>
-              )}
+              )} */}
             </div>
           </FormContainer>
         </div>

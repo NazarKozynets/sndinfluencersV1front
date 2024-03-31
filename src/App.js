@@ -45,10 +45,12 @@ import StripeButton from "./components/Payment/StripeButton";
 import PaypalButton from "./components/Payment/PaypalButton";
 import TermsClient from "./pages/terms-client";
 import TermsInfluencer from "./pages/terms-influencer";
+import JivoChat from "./components/JivoChat";
 
 const App = () => {
   return (
     <>
+      <JivoChat/>
       <ThemeProvider>
         <Routes>
           <Route path="/signup" element={<PublicRoute element={Signup} />} />
@@ -275,7 +277,7 @@ const App = () => {
           <Route path="/" element={<PublicRoute element={Signup} />} />
         </Routes>
       </ThemeProvider>
-    </>
+      </>
   );
 };
 

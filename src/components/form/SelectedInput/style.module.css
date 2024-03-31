@@ -23,7 +23,7 @@
 }
 
 .placeholder {
-  color: var(--placeholder);
+  color: var(--text);
   font-family: Geometria;
   font-size: 18px;
   font-style: normal;

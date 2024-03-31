@@ -226,6 +226,15 @@
   flex-wrap: wrap;
   gap: 20px;
   margin-top: 60px;
+  padding: 0 20px;
+}
+
+.swiper-pagination {
+  bottom: 125px !important;
+}
+
+.swiper-button-next, .swiper-button-prev {
+  margin-top: -100px !important;
 }
 
 .account-client-choose-item {

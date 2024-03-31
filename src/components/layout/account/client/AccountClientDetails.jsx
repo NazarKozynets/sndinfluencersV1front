@@ -10,6 +10,12 @@ import {
   formatPhoneNumber,
   validatePhoneNumber,
 } from "../../../../utils/validations";
+import InputFile from "../../../form/InputFile";
+
+import { useNavigate } from "react-router-dom";
+
+
+import arrow from "../../../../images/icons/arrow.svg";
 
 const AccountClientDetails = () => {
   const [data, setData] = useState({});
@@ -31,6 +37,10 @@ const AccountClientDetails = () => {
   const [errorCurrentPassword, setErrorCurrentPassword] = useState(false);
   const [errorNewPassword, setErrorNewPassword] = useState(false);
   const [errorRepeatPassword, setErrorRepeatPassword] = useState(false);
+
+  const [avatar, setAvatar] = useState(null);
+  const [fileImage, setFile] = useState(null);
+
 
   const [dataPersonal, setDataPersonal] = useState({
     firstName: "",
@@ -54,11 +64,29 @@ const AccountClientDetails = () => {
   const [dataPhone, setDataPhone] = useState("");
 
   const updateClientPersonal = async () => {
+    
     if (!dataPersonal.firstName) {
       setErrorFirstName(true);
     }
     if (!dataPersonal.instagramUsername) {
       setErrorInstagram(true);
+    }
+
+    let responseURL = dataPersonal.logo;
+    
+    if(fileImage){
+      const formDataScreenshot = new FormData();
+      formDataScreenshot.append("file", fileImage);
+       responseURL = await axios.post(
+        `${process.env.REACT_APP_SERVER}/promos/uploadScreenshot`,
+        formDataScreenshot,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
     }
 
     try {
@@ -67,7 +95,7 @@ const AccountClientDetails = () => {
       }
       const result = await axios.put(
         `${process.env.REACT_APP_SERVER}/profile/client/personal`,
-        { ...dataPersonal, id: data._id }
+        { ...dataPersonal, logo: responseURL.data ? responseURL.data.data : responseURL, id: data._id }
       );
       if (result.data.code === 200) {
         setIsOpenPersonal(false);
@@ -115,7 +143,7 @@ const AccountClientDetails = () => {
         });
         return;
       }
-      setErrorRepeatPassword(true);
+      setErrorCurrentPassword(true);
     } catch (err) {
       console.log(err);
     }
@@ -189,6 +217,7 @@ const AccountClientDetails = () => {
         referalCode: dataFetch.referalCode,
         logo: dataFetch.logo,
       });
+      setAvatar(dataFetch.logo);
       setDataCompany({
         company: dataFetch.company,
         companyType: dataFetch.companyType,
@@ -200,6 +229,20 @@ const AccountClientDetails = () => {
     }
   };
 
+  const handleAvatar = (file) =>{
+    if (file && file.type.match('image.*')) {
+      setFile(file);
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        setAvatar(e.target.result);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  const navigation = useNavigate();
   useEffect(() => {
     getData();
   }, []);
@@ -207,12 +250,28 @@ const AccountClientDetails = () => {
     <>
       <section className="account-influencer-details">
         <div className="container-form">
-          <div className="account-influencer-details-block">
+          <div className="account-influencer-details-block" style={{position: "relative"}}>
             <TitleSection title="MY" span="account" />
 
             <p className="account-influencer-details-second">
               My Account Details
             </p>
+
+            <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/client")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
             <div className="account-influencer-details-thoomb">
               <div className="account-influencer-details-wrapper">
@@ -437,14 +496,12 @@ const AccountClientDetails = () => {
             error={errorReferalCode}
             onFocus={() => setErrorReferalCode()}
           />
-          <TextInput
+          {avatar && <img style={{marginTop: "20px", maxWidth: "70px"}} src={avatar || avatar?.url} /> }
+          <InputFile
             title="Logo"
             placeholder="logo"
             style={{ marginTop: "50px" }}
-            value={dataPersonal.logo}
-            setValue={(value) =>
-              setDataPersonal({ ...dataPersonal, logo: value })
-            }
+            setValue={handleAvatar}
             error={errorLogo}
             onFocus={() => setErrorLogo()}
           />

@@ -9,9 +9,12 @@ import support from "../../../../images/icons/support.svg";
 import AltButton from "../../../form/AltButton";
 import UseVerify from "../../../../hooks/useVerify";
 import { Link, useNavigate } from "react-router-dom";
+import ModalWindow from "../../../ModalWindow";
+import StandartButton from "../../../form/StandartButton";
 
 const AccountInfluencerHome = () => {
   const navigation = useNavigate();
+  const [isModal, setIsModal] = useState(false);
   const [data, setData] = useState({
     balance: "0",
   });
@@ -20,6 +23,7 @@ const AccountInfluencerHome = () => {
     try {
       const { dataFetch } = await UseVerify("influencer");
       setData(dataFetch);
+      window.sessionStorage.setItem("balance", dataFetch?.balance);
     } catch (err) {
       console.log(err);
     }
@@ -28,6 +32,12 @@ const AccountInfluencerHome = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  const handleInvoice = () => {
+    if(+data.balance === 0 ) return setIsModal(true);
+    navigation("/account/influencer/create-invoice")
+  }
+
   return (
     <section className="account-client">
       <div className="container">
@@ -38,14 +48,14 @@ const AccountInfluencerHome = () => {
             <p className="account-influencer-balance-score">
               Balance Due:{" "}
               <span className="account-influencer-balance-score-span">
-                {data.balance} $
+                {data.balance} €
               </span>
             </p>
 
             <AltButton
               text="Create an Invoice"
               style={{ padding: "9px 45px" }}
-              onClick={() => navigation("/account/influencer/create-invoice")}
+              onClick={handleInvoice}
             />
           </div>
 
@@ -137,6 +147,44 @@ const AccountInfluencerHome = () => {
           </ul>
         </div>
       </div>
+
+      <ModalWindow
+        header="NOTICE!"
+        isOpen={isModal}
+        setClose={setIsModal}
+      >
+        <div className="account-influencer-details-form">
+          <div
+            style={{
+              marginTop: "60px",
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+            }}
+          >
+      
+            <p
+              style={{
+                color: "#000",
+                textAlign: "center",
+                fontFamily: "Geometria",
+                fontSize: 18,
+                fontWeight: 400,
+                marginBottom: 20,
+              }}
+            >
+              An active balance is required to generate an invoice.
+            </p>
+            <StandartButton
+            style={{maxWidth: "150px", margin: '0 auto'}}
+              text={"Ok"}
+              onClick={() => {
+                setIsModal(false);
+              }}
+            />
+          </div>
+        </div>
+      </ModalWindow>
     </section>
   );
 };

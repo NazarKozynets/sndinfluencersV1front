@@ -8,6 +8,7 @@ const initialState = {
     beneficiary: "",
     beneficiaryAddress: '',
     iban: '',
+    vat: '',
     bankCountry: "",
     bankAccountCurrency: "",
     sortCode: "",
@@ -17,6 +18,7 @@ const initialState = {
     contactName: "",
     contactPhone: "",
     contactEmail: "",
+    paypalEmail: "",
     companyName: "",
     companyId: "",
     street: "",
@@ -50,6 +52,9 @@ export const createInvoiceSlice = createSlice({
     setIban: (state, action) => {
       state.data.iban = action.payload;
     },
+    setVat: (state, action) => {
+      state.data.vat = action.payload;
+    },
     setBankCountry: (state, action) => {
       state.data.bankCountry = action.payload;
     },
@@ -73,6 +78,9 @@ export const createInvoiceSlice = createSlice({
     },
     setContactEmail: (state, action) => {
       state.data.contactEmail = action.payload;
+    },
+    setPaypalEmail: (state, action) => {
+      state.data.paypalEmail = action.payload;
     },
     setCompanyName: (state, action) => {
       state.data.companyName = action.payload;
@@ -118,6 +126,32 @@ export const createInvoiceSlice = createSlice({
       state.data.contactName = "";
       state.data.contactPhone = "";
       state.data.contactEmail = "";
+      state.data.paypalEmail = "";
+      state.data.companyName = "";
+      state.data.companyId = "";
+      state.data.street = "";
+      state.data.city = "";
+      state.data.state = "";
+      state.data.postcode = "";
+      state.data.country = "";
+      state.data.notes = "";
+    },
+    setClearFormWithoutAmount: (state) => {
+      state.currentWindow = 0;
+      state.data.payee = "";
+      state.data.bankName = "";
+      state.data.beneficiary = "";
+      state.data.beneficiaryAddress = "";
+      state.data.iban = "";
+      state.data.bankCountry = "";
+      state.data.bankAccountCurrency = "";
+      state.data.sortCode = "";
+      state.data.accountNumber = "";
+      state.data.swiftOrBic = "";
+      state.data.contactName = "";
+      state.data.contactPhone = "";
+      state.data.contactEmail = "";
+      state.data.paypalEmail = "";
       state.data.companyName = "";
       state.data.companyId = "";
       state.data.street = "";
@@ -141,6 +175,7 @@ export const {
   setBankName,
   setBeneficiary,
   setBeneficiaryAddress,
+  setVat,
   setIban,
   setBankCountry,
   setBankAccountCurrency,
@@ -150,6 +185,7 @@ export const {
   setContactName,
   setContactPhone,
   setContactEmail,
+  setPaypalEmail,
   setCompanyName,
   setCompanyId,
   setStreet,
@@ -159,6 +195,7 @@ export const {
   setCountry,
   setNotes,
   setClearForm,
+  setClearFormWithoutAmount,
   setAmount,
   setAllFormInvoice
 } = createInvoiceSlice.actions;

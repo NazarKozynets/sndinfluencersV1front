@@ -4,6 +4,11 @@ import AltButton from "../../../form/AltButton";
 import pdfIcon from "../../../../images/icons/pdf.svg";
 import axios from "axios";
 import UseVerify from "../../../../hooks/useVerify";
+import { useNavigate, useParams } from "react-router-dom";
+
+
+import arrow from "../../../../images/icons/arrow.svg";
+
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -13,6 +18,7 @@ function formatDate(dateString) {
 }
 
 const AccountInfluencerInvoices = () => {
+  const navigation = useNavigate();
   const [data, setData] = useState([]);
 
   const getData = async () => {
@@ -36,9 +42,26 @@ const AccountInfluencerInvoices = () => {
   return (
     <>
       <section className="invoices">
-        <div className="container">
+        <div className="container" style={{position: "relative"}}>
           <TitleSection title="MY" span="account" />
           <p className="invoices-second">My Invoices</p>
+
+          <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/influencer")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
+
 
           <div className="invoices-block">
             {data.length !== 0 ? (
@@ -87,19 +110,19 @@ const AccountInfluencerInvoices = () => {
                               {formatDate(item.createdAt)}
                             </p>
                             <p className="invoices-block-content-item-bank">
-                              Bank Transfer
+                               {item.bankName !== "" ? "Bank Transfer" : "Paypal"}
                             </p>
                           </div>
                           <div className="invoices-block-content-item-mobile-block">
                             <p className="invoices-block-content-item-value">
-                              {item?.amount} USD
+                              {item?.amount} EUR
                             </p>
                             <div className="invoices-block-content-item-status">
                               <p className="invoices-block-content-item-status-value">
-                                Paid
+                                {item?.status}
                               </p>
                             </div>
-                            <a
+                            {/* <a
                               style={{
                                 userSelect: "none",
                                 pointerEvents: item.fileUrl ? "all" : "none",
@@ -111,18 +134,18 @@ const AccountInfluencerInvoices = () => {
                                 className="invoices-block-content-item-document-icon"
                                 src={pdfIcon}
                               />
-                            </a>
+                            </a> */}
 
                             <div className="invoices-block-content-item-message">
                               <p className="invoices-block-content-item-message-text">
-                                Payment Due: 7 days (subject to approval)
+                              {item?.description}
                               </p>
                             </div>
                           </div>
                         </div>
                         <div className="invoices-block-content-item-message-mobile">
                           <p className="invoices-block-content-item-message-text">
-                            Payment Due: 7 days (subject to approval)
+                          {item?.description}
                           </p>
                         </div>
                       </li>
@@ -136,7 +159,7 @@ const AccountInfluencerInvoices = () => {
                       justifyContent: "center",
                     }}
                   >
-                    <AltButton text="See more" />
+                    {/* <AltButton text="See more" /> */}
                   </div>
                 </div>
               </>

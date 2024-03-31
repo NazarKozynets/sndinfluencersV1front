@@ -12,6 +12,7 @@ const TextInput = ({
   type = "text",
   disabled = false,
   disabledTime = "24",
+  silverColor = false,
   ...args
 }) => {
   return (
@@ -20,8 +21,10 @@ const TextInput = ({
         <p className={styles.title}>{title}</p>
         <input
           type={type}
-          style={{ borderColor: error ? "#FB1E1E" : "transparent" }}
-          className={styles.input}
+          style={{
+            borderColor: error ? "#FB1E1E" : "transparent",
+          }}
+          className={silverColor ? styles.inputSilver : styles.input}
           placeholder={disabled ? "" : placeholder}
           value={value}
           onChange={({ target }) => setValue(target.value)}

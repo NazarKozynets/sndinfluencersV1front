@@ -10,6 +10,9 @@ import {
   formatDateStringReport,
 } from "../../../../utils/validations";
 
+import { useNavigate } from "react-router-dom";
+import arrow from "../../../../images/icons/arrow.svg";
+
 const ReportCampaigns = () => {
   const params = useParams();
 
@@ -116,17 +119,34 @@ const ReportCampaigns = () => {
     return total;
   };
 
+  const navigator = useNavigate();
+
   useEffect(() => {
     getData();
   }, []);
   return (
     <section className="report">
       <div className="container">
-        <div className="report-block">
+        <div className="report-block" style={{position: "relative"}}>
           <TitleSection title="report" span="of the campaigns" />
 
-          <div className="report-info">
-            <div className="report-info-item">
+          <div className="report-info" x>
+            <div className="report-info-item" >
+                <button
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: 50,
+                  height: 50,
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  navigator("/account/client/ongoing-promos");
+                }}
+              >
+                <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+              </button>
               <p className="report-info-text">
                 Date submitted:{" "}
                 {dataPromo
@@ -167,27 +187,23 @@ const ReportCampaigns = () => {
                   {data.map((item, indexRow) => (
                     <tr className="report-table-body-row">
                       <td className="report-table-body-row-item-first">
-                        {item.instagramUsername
-                          ? item.instagramUsername
-                          : "No Date"}
+                        {item.instagramUsername ? item.instagramUsername : ""}
                       </td>
                       <td className="report-table-body-row-item">
-                        {item.followersNumber
-                          ? item.followersNumber
-                          : "No Date"}
+                        {item.followersNumber ? item.followersNumber : ""}
                       </td>
                       <td className="report-table-body-row-item-second">
-                        {dataPromo.brand ? dataPromo.brand : "No Date"}
+                        {dataPromo.brand ? dataPromo.brand : ""}
                       </td>
                       <td className="report-table-body-row-item">
                         {dataPromo.createdAt
                           ? formatDateStringReport(dataPromo.createdAt)
-                          : "No Date"}
+                          : ""}
                       </td>
                       <td className="report-table-body-row-item-second">
                         {dataPromo.postDescription
                           ? dataPromo.postDescription
-                          : "No Date"}
+                          : ""}
                       </td>
                       <td className="report-table-body-row-item">
                         {dataPromo.videoLink ? (
@@ -195,7 +211,7 @@ const ReportCampaigns = () => {
                             {dataPromo.videoLink}
                           </a>
                         ) : (
-                          "No Date"
+                          ""
                         )}
                       </td>
                       <td className="report-table-body-row-item-second">
@@ -204,7 +220,7 @@ const ReportCampaigns = () => {
                             {dataPromo.swipeUpLink}
                           </a>
                         ) : (
-                          "No Date"
+                          ""
                         )}
                       </td>
                       <td className="report-table-body-row-item">
@@ -213,7 +229,7 @@ const ReportCampaigns = () => {
                             {dataPromo.storyTag}
                           </a>
                         ) : (
-                          "No Date"
+                          ""
                         )}
                       </td>
                       <td className="report-table-body-row-item-second">
@@ -222,23 +238,23 @@ const ReportCampaigns = () => {
                             {item.postLink}
                           </a>
                         ) : (
-                          "No Date"
+                          ""
                         )}
                       </td>
                       <td className="report-table-body-row-item">
                         {item.screenshot ? (
-                          <a target="_blank" href={item.screenshot}>
-                            {item.screenshot}
+                          <a target="_blank" href={item.screenshot.toString().replace('dl.dropboxusercontent.com', 'www.dropbox.com')}>
+                            {item.screenshot.toString().replace('dl.dropboxusercontent.com', 'www.dropbox.com')}
                           </a>
                         ) : (
-                          "No Date"
+                          ""
                         )}
                       </td>
                       <td className="report-table-body-row-item-second">
-                        {item.impressions ? item.impressions : "No Date"}
+                        {item.impressions ? item.impressions : ""}
                       </td>
                       <td className="report-table-body-row-item">
-                        {item.like ? item.like : "No Date"}
+                        {item.like ? item.like : ""}
                       </td>
                     </tr>
                   ))}
@@ -357,21 +373,17 @@ const ReportCampaigns = () => {
                 {data.map((item) => (
                   <div className="report-mobile-item">
                     <div className="report-mobile-item-influencer">
-                      {item.instagramUsername
-                        ? item.instagramUsername
-                        : "No Date"}
+                      {item.instagramUsername ? item.instagramUsername : ""}
                     </div>
                     <div className="report-mobile-item-info">
                       <p className="report-mobile-item-info-followers">
                         {" "}
-                        {item.followersNumber
-                          ? item.followersNumber
-                          : "No Date"}
+                        {item.followersNumber ? item.followersNumber : ""}
                       </p>
                       <div className="report-mobile-item-info-brand">
                         <p className="report-mobile-item-info-value">
                           {" "}
-                          {dataPromo.brand ? dataPromo.brand : "No Date"}
+                          {dataPromo.brand ? dataPromo.brand : ""}
                         </p>
                         <p className="report-mobile-item-info-title">Brand</p>
                       </div>
@@ -380,7 +392,7 @@ const ReportCampaigns = () => {
                           {" "}
                           {dataPromo.createdAt
                             ? formatDateStringReport(dataPromo.createdAt)
-                            : "No Date"}
+                            : ""}
                         </p>
                         <p className="report-mobile-item-info-title">
                           Date Post
@@ -391,7 +403,7 @@ const ReportCampaigns = () => {
                           {" "}
                           {dataPromo.postDescription
                             ? dataPromo.postDescription
-                            : "No Date"}
+                            : ""}
                         </p>
                         <p className="report-mobile-item-info-title">Caption</p>
                       </div>
@@ -402,9 +414,7 @@ const ReportCampaigns = () => {
                           href={dataPromo.videoLink ? dataPromo.videoLink : ""}
                         >
                           {" "}
-                          {dataPromo.videoLink
-                            ? dataPromo.videoLink
-                            : "No Date"}
+                          {dataPromo.videoLink ? dataPromo.videoLink : ""}
                         </a>
 
                         <p className="report-mobile-item-info-title">Video</p>
@@ -417,9 +427,7 @@ const ReportCampaigns = () => {
                             dataPromo.swipeUpLink ? dataPromo.swipeUpLink : ""
                           }
                         >
-                          {dataPromo.swipeUpLink
-                            ? dataPromo.swipeUpLink
-                            : "No Date"}
+                          {dataPromo.swipeUpLink ? dataPromo.swipeUpLink : ""}
                         </a>
                         <p className="report-mobile-item-info-title">
                           Swipe Up Link
@@ -428,7 +436,7 @@ const ReportCampaigns = () => {
                       <div className="report-mobile-item-info-story-tag">
                         <p className="report-mobile-item-info-value">
                           {" "}
-                          {dataPromo.storyTag ? dataPromo.storyTag : "No Date"}
+                          {dataPromo.storyTag ? dataPromo.storyTag : ""}
                         </p>
                         <p className="report-mobile-item-info-title">
                           Story Tag
@@ -441,7 +449,7 @@ const ReportCampaigns = () => {
                           href={item.postLink ? item.postLink : ""}
                         >
                           {" "}
-                          {item.postLink ? item.postLink : "No Date"}
+                          {item.postLink ? item.postLink : ""}
                         </a>
                         <p className="report-mobile-item-info-title">
                           Post Link
@@ -454,7 +462,7 @@ const ReportCampaigns = () => {
                           href={item.screenshot ? item.screenshot : ""}
                         >
                           {" "}
-                          {item.screenshot ? item.screenshot : "No Date"}
+                          {item.screenshot ? item.screenshot : ""}
                         </a>
                         <p className="report-mobile-item-info-title">
                           Screenshot In
@@ -463,7 +471,7 @@ const ReportCampaigns = () => {
                       <div className="report-mobile-item-info-impressions">
                         <p className="report-mobile-item-info-value">
                           {" "}
-                          {item.impressions ? item.impressions : "No Date"}
+                          {item.impressions ? item.impressions : ""}
                         </p>
                         <p className="report-mobile-item-info-title">
                           Impressions
@@ -472,7 +480,7 @@ const ReportCampaigns = () => {
                       <div className="report-mobile-item-info-like">
                         <p className="report-mobile-item-info-value">
                           {" "}
-                          {item.like ? item.like : "No Date"}
+                          {item.like ? item.like : ""}
                         </p>
                         <p className="report-mobile-item-info-title">Likes</p>
                       </div>

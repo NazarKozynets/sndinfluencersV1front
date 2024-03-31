@@ -11,6 +11,8 @@ import StandartButton from "../../../form/StandartButton";
 import ImageWithFallback from "../../../ImageWithFallback";
 import altLogo from "../../../../images/alt-logo.jpg";
 
+import arrow from "../../../../images/icons/arrow.svg";
+
 const AcountInfluencerNewPromos = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModalReject, setIsOpenModalReject] = useState(false);
@@ -56,8 +58,23 @@ const AcountInfluencerNewPromos = () => {
   return (
     <section className="account-client-past-promos">
       <div className="container">
-        <div className="account-client-past-promos-block">
+        <div className="account-client-past-promos-block" style={{position: "relative"}}>
           <TitleSection title="MY" span="account" />
+          <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/influencer")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
           <p className="account-client-past-promos-second">New promos</p>
 
@@ -87,11 +104,12 @@ const AcountInfluencerNewPromos = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      marginBottom: "20px"
                     }}
                   >
                     <ImageWithFallback
                       style={{ width: "100%", maxWidth: 300 }}
-                      src={item ? (item.clientLogo ? item.clientLogo : "") : ""}
+                      src={item?.clientLogo ? item.clientLogo : ""}
                       fallbackSrc={altLogo}
                     />
                   </div>
@@ -102,6 +120,12 @@ const AcountInfluencerNewPromos = () => {
                     <h2 className="account-client-past-promos-form-current-content-title">
                       Promo {index + 1}
                     </h2>
+                    <p className="account-client-past-promos-form-current-content-client">
+                      Instagram:{" "}
+                      <span className="account-client-past-promos-form-current-content-client-value">
+                        {item ? item.instagramUsername : "No Data"}
+                      </span>
+                    </p>
                     <p className="account-client-past-promos-form-current-content-client">
                       Client:{" "}
                       <span className="account-client-past-promos-form-current-content-client-value">

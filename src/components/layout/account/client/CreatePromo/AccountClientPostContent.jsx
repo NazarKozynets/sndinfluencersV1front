@@ -148,7 +148,28 @@ const AccountClientPostContent = () => {
                 placeholder="Enter data"
                 style={{ marginTop: "60px" }}
                 value={dataPromo.dateRequest}
-                setValue={(value) => dispatch(setDateRequest(value))}
+                setValue={(value) => {
+                  // Remove any non-digit characters
+                  const numericValue = value.replace(/[^\d]/g, '');
+          
+                  // Format the string
+                  let formattedValue = '';
+                  if (numericValue.length <= 2) {
+                      // First two digits for the day
+                      formattedValue = numericValue;
+                  } else if (numericValue.length <= 4) {
+                      // Add slash after the day
+                      formattedValue = `${numericValue.slice(0, 2)}/${numericValue.slice(2)}`;
+                  } else {
+                      // Add slashes for both day and month
+                      formattedValue = `${numericValue.slice(0, 2)}/${numericValue.slice(2, 4)}/${numericValue.slice(4, 8)}`;
+                  }
+          
+                  // Update state
+
+                  dispatch(setDateRequest(formattedValue))
+                  // setFormData({ ...formData, datePost: formattedValue });
+              }}
                 error={formError.dateRequest}
                 onFocus={() =>
                   setFormError({ ...formError, dateRequest: false })

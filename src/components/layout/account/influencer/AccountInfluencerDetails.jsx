@@ -11,10 +11,18 @@ import {
   validatePhoneNumber,
 } from "../../../../utils/validations";
 
+import { useNavigate, useParams } from "react-router-dom";
+
+
 import deleteIcon from "../../../../images/icons/close.svg";
 import SelectedInput from "../../../form/SelectedInput";
 
+import arrow from "../../../../images/icons/arrow.svg";
+
+
+
 const AccountInfluencerDetails = () => {
+  const navigation = useNavigate();
   const [data, setData] = useState({
     firstName: "",
     instagram: [
@@ -226,7 +234,7 @@ const AccountInfluencerDetails = () => {
       }
       setErrorPassword({
         ...errorPassword,
-        repeatPassword: true,
+        currentPassword: true,
       });
     } catch (err) {
       console.log(err);
@@ -331,12 +339,28 @@ const AccountInfluencerDetails = () => {
     <>
       <section className="account-influencer-details">
         <div className="container-form">
-          <div className="account-influencer-details-block">
+          <div className="account-influencer-details-block" style={{position: "relative"}}>
             <TitleSection title="MY" span="account" />
 
             <p className="account-influencer-details-second">
               My Account Details
             </p>
+
+            <button
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 50,
+              height: 50,
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              navigation("/account/influencer")
+            }}
+          >
+            <img src={arrow} style={{ transform: "rotate(180deg)" }} />
+          </button>
 
             <div className="account-influencer-details-thoomb">
               <div className="account-influencer-details-wrapper">
@@ -732,6 +756,7 @@ const AccountInfluencerDetails = () => {
                   <TextInput
                     title={`(${index + 1}) Price`}
                     placeholder="30"
+                    silverColor={true}
                     style={{ marginTop: "50px", pointerEvents: "none" }}
                     value={dataPersonal.instagram[index].price}
                   />
@@ -741,6 +766,7 @@ const AccountInfluencerDetails = () => {
                     placeholder="30"
                     style={{ marginTop: "50px" }}
                     value={dataPersonal.instagram[index].price}
+                    silverColor={true}
                     setValue={(value) => {
                       const updateInstagram = dataPersonal.instagram;
                       updateInstagram[index].price = value;
