@@ -359,7 +359,19 @@ const AccountClientOffers = () => {
 
     const offers = await axios(`${process.env.REACT_APP_SERVER}/promos/offers`);
     if (offers.data.code === 200) {
-      setPrices(offers.data.offers);
+      const parseFollowers = (followers) => {
+        const match = followers.match(/(\d+)(M\+)?/);
+        if (match) {
+          return parseInt(match[1], 10) * (match[2] ? 1000000 : 1);
+        }
+        return 0;
+      };
+    
+      const sortedOffers = offers.data.offers.sort((a, b) => {
+        return parseFollowers(a.followers) - parseFollowers(b.followers);
+      });
+    
+      setPrices(sortedOffers);
     }
     if (result.data.code === 200) {
       if (selectInfluencers.length !== 0) {
@@ -512,7 +524,8 @@ const AccountClientOffers = () => {
                 <div className="account-client-offers-block">
                   <ul className="account-client-offers-text-list">
                     {item.connectInfluencer.map((item, index) => (
-                      <li
+                      item.instagramUsername !== "Techno Airlines" && item.instagramUsername !== "Techno Bible" && item.instagramUsername !== "Techno Of Insta" && item.instagramUsername !== "Deep Tech Mag" && (
+                        <li
                         key={index}
                         className="account-client-offers-text-item"
                         style={{display: "flex", alignItems: "center"}}
@@ -520,7 +533,7 @@ const AccountClientOffers = () => {
                         {item.avatar ? (<img style={{maxWidth: '40px'}} src={item.avatar} alt={item.instagramUsername} />) : null}
                        
                         {item.instagramUsername}
-                      </li>
+                      </li>)
                     ))}
                   </ul>
                 </div>
