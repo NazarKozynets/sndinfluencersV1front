@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import StandartButton from "../../../../form/StandartButton";
+import StandartButton from "../../../../form/StandartButton/index";
 import TextInput from "../../../../form/TextInput";
 import TextArea from "../../../../form/TextArea";
 import { useDispatch, useSelector } from "react-redux";

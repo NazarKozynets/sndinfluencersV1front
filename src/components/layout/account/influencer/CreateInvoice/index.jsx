@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAllFormInvoice } from "../../../../../redux/slice/create-invoice";
 import axios from "axios";
 import UseVerify from "../../../../../hooks/useVerify";
-import StandartButton from "../../../../form/StandartButton";
+import StandartButton from "../../../../form/StandartButton/index";
 import AltButton from "../../../../form/AltButton";
 import { setCurrentWindow } from "../../../../../redux/slice/create-invoice";
 

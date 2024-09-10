@@ -358,7 +358,6 @@ const AccountClientOffers = () => {
     );
 
     const offers = await axios(`${process.env.REACT_APP_SERVER}/promos/offers`);
-
     if (offers.data.code === 200) {
       setPrices(offers.data.offers);
     }
@@ -493,7 +492,8 @@ const AccountClientOffers = () => {
           style={{ padding: "30px 20px 180px 20px" }}
         >
           {prices.map((item, index) => (
-            <SwiperSlide key={item.id}>
+            item.connectInfluencer !== null && (
+              <SwiperSlide key={item.id}>
               <li
                 key={item.id}
                 className={`account-client-offers-item ${
@@ -530,6 +530,7 @@ const AccountClientOffers = () => {
                 </button>
               </li>
             </SwiperSlide>
+            )
           ))}
         </Swiper>
 
@@ -540,7 +541,8 @@ const AccountClientOffers = () => {
         <div className="account-client-choose">
           <ul className="account-client-choose-list">
             {influencers.map((item, index) => (
-              <li
+             item.instagramUsername !== "Techno Airlines" && item.instagramUsername !== "Techno Bible" && item.instagramUsername !== "Techno Of Insta" && item.instagramUsername !== "Deep Tech Mag" && (
+                <li
                 key={index}
                 className={`account-client-choose-item ${
                   item.connect ? "connect" : item.active ? "active" : ""
@@ -594,6 +596,7 @@ const AccountClientOffers = () => {
                   </p>
                 </div>
               </li>
+              )
             ))}
           </ul>
 
